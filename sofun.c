@@ -81,17 +81,26 @@ main(int argc, char *argv[])
 			if (!l.token) break;
 			switch (l.token) {
 			case CLEX_intlit:
-				l_pushback(&ts, &ffi_type_sint32);
-				int i = l.int_number;
-				l_pushback(&vs, &i);
+				l_pushback(&ts, &ffi_type_uint32);
+				int *i = malloc(sizeof(int));
+				*i = l.int_number;
+				l_pushback(&vs, i);
 				break;
 
 			case CLEX_dqstring:
 				l_pushback(&ts, &ffi_type_pointer);
-				char *s = strdup(l.string);
-				l_pushback(&vs, &s);
+				char **s = malloc(sizeof(char *));
+				*s = strdup(l.string);
+				l_pushback(&vs, s);
 				break;
-			
+		
+			case CLEX_floatlit:
+				l_pushback(&ts, &ffi_type_float);
+				float *f = malloc(sizeof(float));
+				*f = l.real_number;
+				l_pushback(&vs, f);
+				break;
+
 			default:
 				warnx("token type not implemented");
 				goto loop;
@@ -103,7 +112,7 @@ main(int argc, char *argv[])
 			continue;
 		}
 
-		ffi_call(&cif, fun_ptr, &ffi_type_void, vs.data); 
+		ffi_call(&cif, fun_ptr, NULL, vs.data); 
 	}
 
 	return EXIT_SUCCESS;
