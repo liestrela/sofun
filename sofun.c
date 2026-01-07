@@ -161,6 +161,7 @@ main(int argc, char *argv[])
 			LIST_RET_FORMATS(f) {}
 			#undef f
 		}
+		free(x);
 	}
 
 	return EXIT_SUCCESS;
