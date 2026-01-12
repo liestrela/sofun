@@ -20,6 +20,7 @@
 	f("int8_t", &ffi_type_sint8,  printf("0x%02x (%d)\n", *(int8_t *)x, *(int8_t *)x)) \
 	f("f32", &ffi_type_float,  printf("%.13f\n", *(float *)x)) \
 	f("f64", &ffi_type_double, printf("%.13f\n", *(double *)x)) \
+	f("str", &ffi_type_pointer, printf("%p (\"%s\")\n", *(void **)x, *(char **)x)) \
 	f("ptr", &ffi_type_pointer, printf("%p\n", *(void **)x))
 
 typedef struct {
@@ -90,7 +91,7 @@ main(int argc, char *argv[])
 		if (!strcmp(l.string, "rt")) {
 			stb_c_lexer_get_token(&l);
 			if (!strcmp(l.string, "rt")) {
-				warnx("rt command usage: rt (void, uintn_t, intn_t, f32, f64, ptr)");
+				warnx("rt command usage: rt (void, uintn_t, intn_t, f32, f64, str, ptr)");
 				goto loop;
 			} else {
 				if (!strcmp(l.string, "void")) ret_type = &ffi_type_void;
@@ -113,6 +114,9 @@ main(int argc, char *argv[])
 		#ifdef DEBUG
 		if (fun_ptr) printf("\"%s\" at %p\n", l.string, fun_ptr);
 		#endif
+
+		for (size_t i=0; i<vs.size; i++)
+			if (vs.data[i]) free(vs.data[i]);
 
 		l_clear(&vs);
 		l_clear(&ts);
